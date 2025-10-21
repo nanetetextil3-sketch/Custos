@@ -97,151 +97,177 @@
     tr:nth-child(even) {
       background: #f9f9f9;
     }
-  </style>
+ <style>
+/* Seus estilos CSS permanecem inalterados */
+/* Apenas para garantir que o layout base funcione */
+.container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+.markup-container {
+    display: flex;
+}
+.markup-container input {
+    flex-grow: 1;
+}
+.markup-container button {
+    margin-left: 10px;
+    padding: 8px 15px;
+}
+button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>CPV - Calculadora de Preço de Venda</h2>
-    
-    <div class="form-group">
-      <label for="produto">Selecione o Produto</label>
-      <select id="produto" onchange="atualizarCusto()">
-        <option value="">-- Selecione --</option>
-      </select>
+    <div class="container">
+        <h2>CPV - Calculadora de Preço de Venda</h2>
+        
+        <div class="form-group">
+            <label for="preco">Preço de Venda (R$)</label>
+            <input type="number" id="preco" placeholder="Digite o preço de venda">
+        </div>
+
+        <div class="form-group">
+            <label for="custo">Custo do Produto (R$)</label>
+            <input type="number" id="custo" placeholder="Digite o custo">
+        </div>
+
+        <div class="form-group">
+            <label for="comissao">Comissão (%)</label>
+            <input type="number" id="comissao" value="5">
+        </div>
+
+        <div class="form-group">
+            <label for="frete">Frete (%)</label>
+            <input type="number" id="frete" value="3">
+        </div>
+
+        <div class="form-group">
+            <label for="markup">Markup (%)</label>
+            <div class="markup-container">
+                <input type="password" id="markup" value="40" placeholder="123" readonly>
+                <button type="button" onclick="desbloquearMarkup()">Visualizar</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="frete">Lucro liquido (R$)</label>
+            <input type="number" id="Lucro">
+        </div>
+
+        <div class="form-group">
+            <label for="frete">Margem liquida (%)</label>
+            <input type="number" id="Margem">
+        </div>
+
+        <button onclick="calcular()">Calcular</button>
+
+        <table id="tabela" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Lucro liquido (R$)</th>
+                    <th>Margem liquida (%)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <button id="limpar" onclick="limparHistorico()">Limpar Histórico</button>
     </div>
 
-    <div class="form-group">
-      <label for="preco">Preço (R$)</label>
-      <input type="number" id="preco" placeholder="Digite o preço de venda">
-    </div>
+<script>
+// A variável produtosWP não é mais necessária, mas foi mantida se usada em outro lugar
+let produtosWP = []; 
 
-    <div class="form-group">
-      <label for="custo">Custo (R$)</label>
-      <input type="number" id="custo" placeholder="Preenchido automaticamente">
-    </div>
+// REMOVIDO: A função assíncrona carregarProdutos()
 
-    <div class="form-group">
-      <label for="comissao">Comissão (%)</label>
-      <input type="number" id="comissao" value="5">
-    </div>
-
-    <div class="form-group">
-      <label for="frete">Frete (%)</label>
-      <input type="number" id="frete" value="3">
-    </div>
-
-    <div class="form-group">
-      <label for="financeiro">Custo Financeiro (%)</label>
-      <input type="number" id="financeiro" value="3">
-    </div>
-
-    <div class="form-group">
-      <label for="markup">Markup (%)</label>
-      <div class="markup-container">
-        <input type="password" id="markup" value="40" placeholder="*****" readonly>
-        <button type="button" onclick="desbloquearMarkup()">Visualizar</button>
-      </div>
-    </div>
-
-    <button onclick="calcular()">Calcular</button>
-
-    <table id="tabela" style="display:none;">
-      <thead>
-        <tr>
-          <th>Produto</th>
-          <th>Custo Líquido (%)</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <button id="limpar" onclick="limparHistorico()">Limpar Histórico</button>
-  </div>
-
- <script>
-let produtosWP = []; // <-- variável global para armazenar os produtos
-
-async function carregarProdutos() {
-  try {
-    const response = await fetch("https://www.nanete.com.br/wp-json/wp/v2/produto");
-    produtosWP = await response.json();
-
-    const selectProduto = document.getElementById("produto");
-    produtosWP.forEach((p, index) => {
-      const opt = document.createElement("option");
-      opt.value = index;
-      opt.textContent = p.title.rendered; // usa o título do post como nome
-      selectProduto.appendChild(opt);
-    });
-  } catch (error) {
-    console.error("Erro ao carregar produtos:", error);
-  }
-}
-
-function atualizarCusto() {
-  const selectProduto = document.getElementById("produto");
-  if (selectProduto.value === "") {
-    document.getElementById("custo").value = "";
-  }
-}
+// REMOVIDO: A função atualizarCusto()
 
 function desbloquearMarkup() {
-  const senha = prompt("Digite a senha para visualizar o Markup:");
-  const markup = document.getElementById("markup");
-  if (senha === "ABCD") {
-    markup.type = "number";
-    markup.removeAttribute("readonly");
-  } else {
-    alert("Senha incorreta!");
-  }
+    const senha = prompt("Digite a senha para visualizar o Markup:");
+    const markup = document.getElementById("markup");
+    if (senha === "ABCD") {
+        markup.type = "number";
+        markup.removeAttribute("readonly");
+    } else {
+        alert("Senha incorreta!");
+    }
 }
 
 function calcular() {
-  const selectProduto = document.getElementById("produto");
-  const index = selectProduto.value;
-  const preco = parseFloat(document.getElementById("preco").value) || 0;
-  const custo = parseFloat(document.getElementById("custo").value) || 0;
-  const comissaoPerc = parseFloat(document.getElementById("comissao").value) || 0;
-  const fretePerc = parseFloat(document.getElementById("frete").value) || 0;
-  const financeiroPerc = parseFloat(document.getElementById("financeiro").value) || 0;
+    // A linha "const index = selectProduto.value;" foi removida
+    const preco = parseFloat(document.getElementById("preco").value) || 0;
+    const custo = parseFloat(document.getElementById("custo").value) || 0;
+    const comissaoPerc = parseFloat(document.getElementById("comissao").value) || 0;
+    const fretePerc = parseFloat(document.getElementById("frete").value) || 0;
+    const financeiroPerc = parseFloat(document.getElementById("financeiro").value) || 0;
 
-  if (index === "") {
-    alert("Selecione um produto!");
-    return;
-  }
-  if (preco <= 0 || custo <= 0) {
-    alert("Digite um preço de venda e um custo válidos!");
-    return;
-  }
+    if (preco <= 0 || custo <= 0) {
+        alert("Digite um preço de venda e um custo válidos!");
+        return;
+    }
 
-  const valorComissao = preco * (comissaoPerc / 100);
-  const valorFrete = preco * (fretePerc / 100);
-  const valorFinanceiro = preco * (financeiroPerc / 100);
+    const valorComissao = preco * (comissaoPerc / 100);
+    const valorFrete = preco * (fretePerc / 100);
+    const valorFinanceiro = preco * (financeiroPerc / 100);
 
-  const lucroLiquido = preco - custo - valorComissao - valorFrete - valorFinanceiro;
-  const custoLiquidoPerc = (lucroLiquido / preco) * 100;
+    const lucroLiquido = preco - custo - valorComissao - valorFrete - valorFinanceiro;
+    // O nome da variável 'custoLiquidoPerc' foi mantido, mas representa a Margem de Lucro Líquida.
+    const margemLucroLiquidaPerc = (lucroLiquido / preco) * 100;
 
-  const tabela = document.getElementById("tabela");
-  const tbody = tabela.querySelector("tbody");
+    const tabela = document.getElementById("tabela");
+    const tbody = tabela.querySelector("tbody");
 
-  tabela.style.display = "table";
+    tabela.style.display = "table";
 
-  const linha = document.createElement("tr");
-  linha.innerHTML = `
-    <td>${produtosWP[index].title.rendered}</td>
-    <td>${custoLiquidoPerc.toFixed(2)}%</td>
-  `;
+    const linha = document.createElement("tr");
+    linha.innerHTML = `
+        <td>R$ ${custo.toFixed(2)}</td>
+        <td>${margemLucroLiquidaPerc.toFixed(2)}%</td>
+    `;
 
-  tbody.appendChild(linha);
+    tbody.appendChild(linha);
 }
 
 function limparHistorico() {
-  const tabela = document.getElementById("tabela");
-  const tbody = tabela.querySelector("tbody");
-  tbody.innerHTML = "";
-  tabela.style.display = "none";
+    const tabela = document.getElementById("tabela");
+    const tbody = tabela.querySelector("tbody");
+    tbody.innerHTML = "";
+    tabela.style.display = "none";
 }
 
-// 🔥 Chama a função ao carregar a página para preencher o select
-carregarProdutos();
+// 🔥 REMOVIDO: A chamada da função carregarProdutos()
+// carregarProdutos(); 
 </script>
+</body>
+</html>
