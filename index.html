@@ -5,107 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CPV - Calculadora de Preço de Venda</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0; padding: 20px;
-      background: #f7f7f7;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    input[readonly] {
-      background: #eee;
-      font-weight: bold;
-    }
-    .markup-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .markup-container button {
-      padding: 8px 14px;
-      font-size: 14px;
-      background: #007BFF;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .markup-container button:hover {
-      background: #0056b3;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #28a745;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background: #218838;
-    }
-    #limpar {
-      background: #dc3545;
-    }
-    #limpar:hover {
-      background: #a71d2a;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 14px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background: #007bff;
-      color: white;
-    }
-    tr:nth-child(even) {
-      background: #f9f9f9;
-    }
- <style>
-/* Seus estilos CSS permanecem inalterados */
-/* Apenas para garantir que o layout base funcione */
+/* Estilos Básicos */
 .container {
-    max-width: 500px;
-    margin: 50px auto;
-    padding: 20px;
+    max-width: 450px; 
+    margin: 20px auto;
+    padding: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
+    font-family: Arial, sans-serif;
 }
 .form-group {
     margin-bottom: 15px;
@@ -115,8 +22,7 @@
     margin-bottom: 5px;
     font-weight: bold;
 }
-.form-group input,
-.form-group select {
+.form-group input {
     width: 100%;
     padding: 8px;
     box-sizing: border-box;
@@ -130,21 +36,45 @@
 .markup-container button {
     margin-left: 10px;
     padding: 8px 15px;
+    white-space: nowrap;
 }
 button {
     padding: 10px 20px;
     margin-top: 10px;
     cursor: pointer;
-}
-table {
     width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
 }
-th, td {
+
+/* Estilo da Tabela de Resultados */
+#tabela-wrapper {
+    margin-top: 20px;
+}
+#tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+#tabela th, #tabela td {
     border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+    padding: 10px 5px;
+    text-align: center;
+}
+#limpar {
+    margin-top: 20px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* RESPONSIVIDADE PARA TELAS PEQUENAS (Mobile) */
+/* -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+    .container {
+        margin: 0;
+        border: none;
+        border-radius: 0;
+    }
 }
 </style>
 </head>
@@ -173,46 +103,34 @@ th, td {
         </div>
 
         <div class="form-group">
-            <label for="markup">Markup (%)</label>
+            <label for="markup">Markup (%) sobre o Custo</label>
             <div class="markup-container">
-                <input type="password" id="markup" value="40" placeholder="123" readonly>
+                <input type="password" id="markup" value="7" placeholder="7" readonly>
                 <button type="button" onclick="desbloquearMarkup()">Visualizar</button>
             </div>
         </div>
-
-        <div class="form-group">
-            <label for="frete">Lucro liquido (R$)</label>
-            <input type="number" id="Lucro">
-        </div>
-
-        <div class="form-group">
-            <label for="frete">Margem liquida (%)</label>
-            <input type="number" id="Margem">
-        </div>
-
+        
         <button onclick="calcular()">Calcular</button>
-
-        <table id="tabela" style="display:none;">
-            <thead>
-                <tr>
-                    <th>Lucro liquido (R$)</th>
-                    <th>Margem liquida (%)</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        
+        <div id="tabela-wrapper" style="display:none;"> 
+            <table id="tabela">
+                <thead>
+                    <tr>
+                        <th>Lucro Líquido (R$)</th>
+                        <th>Margem Líquida (%)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
         <button id="limpar" onclick="limparHistorico()">Limpar Histórico</button>
     </div>
 
 <script>
-// A variável produtosWP não é mais necessária, mas foi mantida se usada em outro lugar
 let produtosWP = []; 
 
-// REMOVIDO: A função assíncrona carregarProdutos()
-
-// REMOVIDO: A função atualizarCusto()
-
+// RESTAURADO: A função de visualização com senha
 function desbloquearMarkup() {
     const senha = prompt("Digite a senha para visualizar o Markup:");
     const markup = document.getElementById("markup");
@@ -225,35 +143,57 @@ function desbloquearMarkup() {
 }
 
 function calcular() {
-    // A linha "const index = selectProduto.value;" foi removida
+    // 1. Coletar e validar os dados de entrada
     const preco = parseFloat(document.getElementById("preco").value) || 0;
     const custo = parseFloat(document.getElementById("custo").value) || 0;
     const comissaoPerc = parseFloat(document.getElementById("comissao").value) || 0;
     const fretePerc = parseFloat(document.getElementById("frete").value) || 0;
-    const financeiroPerc = parseFloat(document.getElementById("financeiro").value) || 0;
-
+    
+    // Markup (percentual sobre o Custo)
+    const markupPercSobreCusto = parseFloat(document.getElementById("markup").value) || 0; 
+    
+    // Validação básica
     if (preco <= 0 || custo <= 0) {
-        alert("Digite um preço de venda e um custo válidos!");
+        alert("Digite um Preço de Venda e um Custo válidos para o cálculo!");
         return;
     }
 
+    // ----------------------------------------------------
+    // CÁLCULO DOS CUSTOS
+    // ----------------------------------------------------
+    
+    // 1. Custo Fixo do Markup (R$) - Markup aplicado sobre o CUSTO do produto
+    const valorMarkupR = custo * (markupPercSobreCusto / 100);
+    
+    // 2. Despesas Variáveis em R$ (aplicadas sobre o Preço de Venda)
     const valorComissao = preco * (comissaoPerc / 100);
     const valorFrete = preco * (fretePerc / 100);
-    const valorFinanceiro = preco * (financeiroPerc / 100);
+    
+    // ----------------------------------------------------
+    // CÁLCULO DE RENTABILIDADE
+    // ----------------------------------------------------
+    
+    // Lucro Líquido (R$) = Preço - Custo Produto - Custo Markup - Comissão - Frete
+    const lucroLiquidoR = preco - custo - valorMarkupR - valorComissao - valorFrete;
 
-    const lucroLiquido = preco - custo - valorComissao - valorFrete - valorFinanceiro;
-    // O nome da variável 'custoLiquidoPerc' foi mantido, mas representa a Margem de Lucro Líquida.
-    const margemLucroLiquidaPerc = (lucroLiquido / preco) * 100;
+    // Margem Líquida (%) = (Lucro Líquido / Preço) * 100
+    const margemLiquidaPerc = (lucroLiquidoR / preco) * 100;
 
+    // ----------------------------------------------------
+    // 3. Atualizar a tabela de resultados (histórico)
+    // ----------------------------------------------------
+    
     const tabela = document.getElementById("tabela");
     const tbody = tabela.querySelector("tbody");
 
+    // Exibe o wrapper e a tabela
+    document.getElementById("tabela-wrapper").style.display = "block";
     tabela.style.display = "table";
 
     const linha = document.createElement("tr");
     linha.innerHTML = `
-        <td>R$ ${custo.toFixed(2)}</td>
-        <td>${margemLucroLiquidaPerc.toFixed(2)}%</td>
+        <td>R$ ${lucroLiquidoR.toFixed(2)}</td>
+        <td>${margemLiquidaPerc.toFixed(2)}%</td>
     `;
 
     tbody.appendChild(linha);
@@ -263,11 +203,9 @@ function limparHistorico() {
     const tabela = document.getElementById("tabela");
     const tbody = tabela.querySelector("tbody");
     tbody.innerHTML = "";
+    document.getElementById("tabela-wrapper").style.display = "none";
     tabela.style.display = "none";
 }
-
-// 🔥 REMOVIDO: A chamada da função carregarProdutos()
-// carregarProdutos(); 
 </script>
 </body>
 </html>
